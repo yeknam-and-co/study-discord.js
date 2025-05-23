@@ -9,6 +9,7 @@ try {
     data = JSON.parse(fs.readFileSync('data.json', 'utf8'));
 } catch (e) {
     console.log('no data file found, creating a new one');
+    fs.writeFileSync('data.json', JSON.stringify({}, null, 2));
 }
 
 const client = new Client({ 
