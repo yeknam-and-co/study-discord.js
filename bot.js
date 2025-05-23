@@ -108,26 +108,25 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.reply('there was an error with your topics data. please try creating new topics.');
     } 
     
-    if (index < 0 || index >= topics.length) {
+    if (topics.length === 0) {
+      return interaction.reply('you have no topics yet! use /create to add some topics.');
+    }
+
+    // Convert from 1-based user input to 0-based array index
+    const arrayIndex = index - 1;
+    
+    if (index < 1 || index > topics.length) {
       return interaction.reply(`invalid index! please use a number between 1 and ${topics.length}`);
     }
 
-
-    if (!topics[index]) {
-      console.error('Topic at index is undefined:', { index, topics });
-      return interaction.reply('there was an error finding that topic. please try again.');
-    }
-
-    // just handle all edge cases because FUCK users   
-
-    topics[index-1].done = true;
+    topics[arrayIndex].done = true;
     saveData();
     
     const embed = new EmbedBuilder()
       .setTitle('Topic Updated')
-      .setDescription(`Marked "${topics[index-1].name}" as complete! ✅`)
+      .setDescription(`Marked "${topics[arrayIndex].name}" as complete! ✅`)
       .setColor(0x00ff00);
-      // this is actually the important bit we just find the index and to the done value mark it as done
+      
     interaction.reply({ embeds: [embed] });
   }
 
@@ -145,14 +144,27 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.reply('there was an error with your topics data. please try creating new topics.');
     }
 
-    if (index < 0 || index >= topics.length) {
+    if (topics.length === 0) {
+      return interaction.reply('you have no topics yet! use /create to add some topics.');
+    }
+
+    // Convert from 1-based user input to 0-based array index
+    const arrayIndex = index - 1;
+
+    if (index < 1 || index > topics.length) {
       return interaction.reply(`invalid index! please use a number between 1 and ${topics.length}`);
     }
 
-    topics.splice(index-1, 1);
+    const deletedTopic = topics[arrayIndex].name;
+    topics.splice(arrayIndex, 1);
     saveData();
 
-    interaction.reply(`Deleted topic ${index}`); // delete the topic at the index
+    const embed = new EmbedBuilder()
+      .setTitle('Topic Deleted')
+      .setDescription(`Deleted topic: "${deletedTopic}"`)
+      .setColor(0xff0000);
+
+    interaction.reply({ embeds: [embed] });
   }
 
   if (interaction.commandName === 'clear') {
